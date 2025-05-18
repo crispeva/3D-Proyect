@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Explotion : MonoBehaviour
@@ -8,6 +9,7 @@ public class Explotion : MonoBehaviour
 
     #region Fields
     [SerializeField] private GameObject _explosionPrefab;
+    private float _explosionArea;
     #endregion
 
     #region Unity Callbacks
@@ -31,10 +33,19 @@ public class Explotion : MonoBehaviour
         {
             other.GetComponent<Animator>().enabled = false;
             _explosionPrefab.SetActive(true);
-            //other.GetComponent<Rigidbody>().isKinematic = true;
-            // other.GetComponent<Collider>().enabled = false;
-            Destroy(other.gameObject, 2f);
+            Destroy(_explosionPrefab.gameObject, 2f);
         }
+        Animator playeAnim = other.GetComponentInParent<Animator>();
+        if (playeAnim != null)
+            playeAnim.enabled = false;
+
+        ExplosionForce();
+    }
+
+    private void ExplosionForce()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, _explosionArea);
     }
     #endregion
 }
