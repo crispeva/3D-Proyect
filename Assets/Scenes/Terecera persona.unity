@@ -1932,9 +1932,9 @@ GameObject:
   m_Component:
   - component: {fileID: 198545851}
   - component: {fileID: 198545850}
+  - component: {fileID: 198545852}
   - component: {fileID: 198545849}
   - component: {fileID: 198545848}
-  - component: {fileID: 198545852}
   m_Layer: 0
   m_Name: Mine
   m_TagString: Untagged
@@ -2046,9 +2046,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _explosionPrefab: {fileID: 1461513263}
-  _cameraExplotion: {fileID: 100826890}
-  _cameraMain: {fileID: 736564869}
-  _player: {fileID: 180539089}
 --- !u!1 &227034754 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -203856693384778745, guid: 5e3e40652d78ffd41abc5ad3b4c56dd3, type: 3}
@@ -6492,6 +6489,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1288027212}
+  - component: {fileID: 1288027213}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -6514,6 +6512,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1288027213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288027211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d9199154592af44cb21d46b266dc596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cameraExplotion: {fileID: 100826890}
+  _cameraMain: {fileID: 736564869}
 --- !u!43 &1347820347
 Mesh:
   m_ObjectHideFlags: 0
