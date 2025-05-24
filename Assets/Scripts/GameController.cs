@@ -3,6 +3,7 @@ using System.Collections;
 using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
 
 public class GameController : MonoBehaviour
 {
@@ -13,17 +14,19 @@ public class GameController : MonoBehaviour
     private Explotion _explosion;
     [SerializeField] private Camera _cameraExplotion;
     [SerializeField] private Camera _cameraMain;
-    private bool _isRecovering = false;
     [SerializeField] private GameObject _playerRoot;
     float distancia;
     Rigidbody rb;
+    CharacterController controller;
+    Animator playeAnim;
     #endregion
 
     #region Unity Callbacks
     private void Awake()
     {
        _explosion = FindFirstObjectByType<Explotion>(); // Updated to use the recommended method
-        rb = _playerRoot.GetComponentInChildren<Rigidbody>();
+       // rb = _playerRoot.GetComponentInChildren<Rigidbody>();
+      
 
     }
     void Start()
@@ -38,7 +41,7 @@ public class GameController : MonoBehaviour
         if (_cameraExplotion.enabled )
         {
 
-            if (distancia < 2f && rb.linearVelocity.magnitude < 0.5f)
+            if (distancia < 3f && rb.linearVelocity.magnitude < 0.5f)
             {
                 PlayerRecover();
             }
@@ -58,18 +61,20 @@ public class GameController : MonoBehaviour
 
     private void Explotion()
     {
+        //Referencias
+        rb = _explosion.Player.GetComponentInChildren<Rigidbody>();
+        controller = _explosion.Player.GetComponentInChildren<CharacterController>();
         //Cameras
         _cameraMain.enabled = false;
         _cameraExplotion.enabled = true;
 
         //Animations
-        Animator playeAnim = _explosion.Player.GetComponentInParent<Animator>();
+        playeAnim = _explosion.Player.GetComponentInParent<Animator>();
         _explosion.Player = playeAnim.transform.GetChild(1).gameObject;
         if (playeAnim != null)
         {
             playeAnim.enabled = false;
         }
-        _isRecovering = false; // Permite la recuperaci�n tras una nueva explosi�n
     }
     private void OnCameraFollow()
     {
@@ -82,7 +87,6 @@ public class GameController : MonoBehaviour
     }
     private void PlayerRecover()
     {
-        CharacterController controller = _playerRoot.GetComponent<CharacterController>();
         if (controller != null)
         {
             controller.enabled = false; // Desactiva el controlador para evitar problemas de colisi�n
@@ -91,14 +95,13 @@ public class GameController : MonoBehaviour
         _playerRoot.transform.position = _explosion.Player.transform.position;
         _playerRoot.transform.rotation = Quaternion.identity; // o mantener rotaci�n de la c�mara
 
-        Animator anim = _playerRoot.GetComponent<Animator>();
         if (controller != null) controller.enabled = true;
         _cameraMain.enabled = true;
         _cameraExplotion.enabled = false;
 
         // Reactiva Animator y controles
        
-        if (anim != null) anim.enabled = true;
+        if (playeAnim != null) playeAnim.enabled = true;
 
         // Reactiva controlador
         Debug.Log("Jugador recuperado");
