@@ -3,6 +3,7 @@ using System.Collections;
 using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
 
 public class GameController : MonoBehaviour
@@ -16,18 +17,17 @@ public class GameController : MonoBehaviour
     [SerializeField] private Camera _cameraMain;
     [SerializeField] private GameObject _playerRoot;
     float distancia;
+    //Componentes
     Rigidbody rb;
     CharacterController controller;
     Animator playeAnim;
+    Transform rootTransform;
     #endregion
 
     #region Unity Callbacks
     private void Awake()
     {
        _explosion = FindFirstObjectByType<Explotion>(); // Updated to use the recommended method
-       // rb = _playerRoot.GetComponentInChildren<Rigidbody>();
-      
-
     }
     void Start()
     {
@@ -37,11 +37,11 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        OnCameraFollow();
-        if (_cameraExplotion.enabled )
-        {
 
-            if (distancia < 3f && rb.linearVelocity.magnitude < 0.5f)
+        if (_cameraExplotion.enabled)
+        {
+            OnCameraFollow();
+            if (distancia < 4f && rb.linearVelocity.magnitude < 0.5f)
             {
                 PlayerRecover();
             }
@@ -61,19 +61,26 @@ public class GameController : MonoBehaviour
 
     private void Explotion()
     {
-        //Referencias
+        if (_explosion.Player!=null)
+        {
+            //Referencias
         rb = _explosion.Player.GetComponentInChildren<Rigidbody>();
         controller = _explosion.Player.GetComponentInChildren<CharacterController>();
+        rootTransform = _explosion.Player.GetComponentInParent<Transform>();
+        playeAnim = _explosion.Player.GetComponentInParent<Animator>();
+
         //Cameras
         _cameraMain.enabled = false;
         _cameraExplotion.enabled = true;
 
         //Animations
-        playeAnim = _explosion.Player.GetComponentInParent<Animator>();
         _explosion.Player = playeAnim.transform.GetChild(1).gameObject;
         if (playeAnim != null)
         {
             playeAnim.enabled = false;
+        }
+            //Desactiva controlador input
+        _explosion.Player.GetComponentInParent<PlayerInput>().enabled = false;
         }
     }
     private void OnCameraFollow()
@@ -91,18 +98,23 @@ public class GameController : MonoBehaviour
         {
             controller.enabled = false; // Desactiva el controlador para evitar problemas de colisi�n
         }
-        // Mueve el jugador entero (root) a la posici�n del cad�ver
-        _playerRoot.transform.position = _explosion.Player.transform.position;
-        _playerRoot.transform.rotation = Quaternion.identity; // o mantener rotaci�n de la c�mara
+
+        // Mueve el jugador entero
+         rootTransform.position = _explosion.Player.transform.position;
+         rootTransform.rotation = Quaternion.identity; // o mantener rotaci�n de la c�mara
 
         if (controller != null) controller.enabled = true;
         _cameraMain.enabled = true;
         _cameraExplotion.enabled = false;
 
         // Reactiva Animator y controles
-       
-        if (playeAnim != null) playeAnim.enabled = true;
 
+        if (playeAnim != null)
+        {
+            playeAnim.enabled = true;
+        }
+        //Desactiva controlador input
+        _explosion.Player.GetComponentInParent<PlayerInput>().enabled = true;
         // Reactiva controlador
         Debug.Log("Jugador recuperado");
     }
