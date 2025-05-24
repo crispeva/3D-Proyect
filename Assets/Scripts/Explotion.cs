@@ -37,9 +37,8 @@ public class Explotion : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             //Effect
-            _explosionPrefab.SetActive(true);
             Player = other.gameObject;
-            Destroy(_explosionPrefab.gameObject, 2f);
+            _explosionPrefab.GetComponent<ParticleSystem>().Play();
         }
 
         OnExplosion?.Invoke();

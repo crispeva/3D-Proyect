@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,6 +13,9 @@ public class GameController : MonoBehaviour
     private Explotion _explosion;
     [SerializeField] private Camera _cameraExplotion;
     [SerializeField] private Camera _cameraMain;
+    private bool _isRecovering = false;
+    [SerializeField] private GameObject _playerRoot;
+    float distancia;
     #endregion
 
     #region Unity Callbacks
@@ -29,7 +33,19 @@ public class GameController : MonoBehaviour
     void Update()
     {
         OnCameraFollow();
-        if (_cameraExplotion.enabled) PlayerRecover();
+        if (_cameraExplotion.enabled && !_isRecovering)
+        {
+
+            if (distancia < 2f)
+            {
+                StartCoroutine(PlayerRecover());
+            }
+            else
+            {
+
+                distancia = Vector3.Distance(_cameraExplotion.transform.position, _explosion.Player.transform.position);
+            }
+        }
     }
     #endregion
 
@@ -51,6 +67,7 @@ public class GameController : MonoBehaviour
         {
             playeAnim.enabled = false;
         }
+        _isRecovering = false; // Permite la recuperación tras una nueva explosión
     }
     private void OnCameraFollow()
     {
@@ -61,20 +78,30 @@ public class GameController : MonoBehaviour
             _cameraExplotion.transform.Translate(_cameraExplotion.transform.forward * Time.deltaTime * 2, Space.World);
         }
     }
-    private void PlayerRecover()
+    private IEnumerator PlayerRecover()
     {
-        float distancia = Vector3.Distance(_cameraExplotion.transform.position, _explosion.Player.transform.position);
-        Debug.Log(distancia);
-        if (distancia < 1.5f)
+        _isRecovering = true; // Evita múltiples corrutinas
+        yield return new WaitForSeconds(3f);
+        CharacterController controller = _playerRoot.GetComponent<CharacterController>();
+        if (controller != null)
         {
-            _cameraMain.enabled = true;
-            _explosion.Player.GetComponentInParent<Animator>().enabled = true;
-            _explosion.Player.transform.position = Vector3.zero;
-            _cameraExplotion.enabled = false;
-
-            Debug.Log("Hola ratitas");
-
+            controller.enabled = false; // Desactiva el controlador para evitar problemas de colisión
         }
+        // Mueve el jugador entero (root) a la posición del cadáver
+        _playerRoot.transform.position = _explosion.Player.transform.position;
+        _playerRoot.transform.rotation = Quaternion.identity; // o mantener rotación de la cámara
+
+        Animator anim = _playerRoot.GetComponent<Animator>();
+        if (controller != null) controller.enabled = true;
+        _cameraMain.enabled = true;
+        _cameraExplotion.enabled = false;
+
+        // Reactiva Animator y controles
+       
+        if (anim != null) anim.enabled = true;
+
+        // Reactiva controlador
+        Debug.Log("Jugador recuperado");
     }
 }
     #endregion
