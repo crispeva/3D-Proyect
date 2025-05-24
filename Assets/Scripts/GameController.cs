@@ -16,12 +16,14 @@ public class GameController : MonoBehaviour
     private bool _isRecovering = false;
     [SerializeField] private GameObject _playerRoot;
     float distancia;
+    Rigidbody rb;
     #endregion
 
     #region Unity Callbacks
     private void Awake()
     {
        _explosion = FindFirstObjectByType<Explotion>(); // Updated to use the recommended method
+        rb = _playerRoot.GetComponentInChildren<Rigidbody>();
 
     }
     void Start()
@@ -33,12 +35,12 @@ public class GameController : MonoBehaviour
     void Update()
     {
         OnCameraFollow();
-        if (_cameraExplotion.enabled && !_isRecovering)
+        if (_cameraExplotion.enabled )
         {
 
-            if (distancia < 2f)
+            if (distancia < 2f && rb.linearVelocity.magnitude < 0.5f)
             {
-                StartCoroutine(PlayerRecover());
+                PlayerRecover();
             }
             else
             {
@@ -67,7 +69,7 @@ public class GameController : MonoBehaviour
         {
             playeAnim.enabled = false;
         }
-        _isRecovering = false; // Permite la recuperación tras una nueva explosión
+        _isRecovering = false; // Permite la recuperaciï¿½n tras una nueva explosiï¿½n
     }
     private void OnCameraFollow()
     {
@@ -78,18 +80,16 @@ public class GameController : MonoBehaviour
             _cameraExplotion.transform.Translate(_cameraExplotion.transform.forward * Time.deltaTime * 2, Space.World);
         }
     }
-    private IEnumerator PlayerRecover()
+    private void PlayerRecover()
     {
-        _isRecovering = true; // Evita múltiples corrutinas
-        yield return new WaitForSeconds(3f);
         CharacterController controller = _playerRoot.GetComponent<CharacterController>();
         if (controller != null)
         {
-            controller.enabled = false; // Desactiva el controlador para evitar problemas de colisión
+            controller.enabled = false; // Desactiva el controlador para evitar problemas de colisiï¿½n
         }
-        // Mueve el jugador entero (root) a la posición del cadáver
+        // Mueve el jugador entero (root) a la posiciï¿½n del cadï¿½ver
         _playerRoot.transform.position = _explosion.Player.transform.position;
-        _playerRoot.transform.rotation = Quaternion.identity; // o mantener rotación de la cámara
+        _playerRoot.transform.rotation = Quaternion.identity; // o mantener rotaciï¿½n de la cï¿½mara
 
         Animator anim = _playerRoot.GetComponent<Animator>();
         if (controller != null) controller.enabled = true;
