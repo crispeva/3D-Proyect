@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using Cinemachine;
 using Unity.VisualScripting;
@@ -40,16 +40,13 @@ public class GameController : MonoBehaviour
 
         if (_cameraExplotion.enabled)
         {
+            distancia = Vector3.Distance(_cameraExplotion.transform.position, _explosion.Player.transform.position);
             OnCameraFollow();
-            if (distancia < 4f && rb.linearVelocity.magnitude < 0.5f)
+            if (distancia < 4f && rb.linearVelocity.magnitude < 2f && rb!=null)
             {
                 PlayerRecover();
             }
-            else
-            {
-
-                distancia = Vector3.Distance(_cameraExplotion.transform.position, _explosion.Player.transform.position);
-            }
+           // Debug.Log($"Distancia: {distancia}, Velocidad: {rb.linearVelocity.magnitude}");
         }
     }
     #endregion
@@ -80,7 +77,8 @@ public class GameController : MonoBehaviour
             playeAnim.enabled = false;
         }
             //Desactiva controlador input
-        _explosion.Player.GetComponentInParent<PlayerInput>().enabled = false;
+
+        if (_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = false;
         }
     }
     private void OnCameraFollow()
@@ -97,10 +95,12 @@ public class GameController : MonoBehaviour
         if (controller != null)
         {
             controller.enabled = false; // Desactiva el controlador para evitar problemas de colisi�n
+            Debug.Log("Controlador desactivado");
         }
 
         // Mueve el jugador entero
-         rootTransform.position = _explosion.Player.transform.position;
+        
+        rootTransform.position = _explosion.Player.transform.position;
          rootTransform.rotation = Quaternion.identity; // o mantener rotaci�n de la c�mara
 
         if (controller != null) controller.enabled = true;
@@ -114,7 +114,8 @@ public class GameController : MonoBehaviour
             playeAnim.enabled = true;
         }
         //Desactiva controlador input
-        _explosion.Player.GetComponentInParent<PlayerInput>().enabled = true;
+        if(_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = true;
+
         // Reactiva controlador
         Debug.Log("Jugador recuperado");
     }
