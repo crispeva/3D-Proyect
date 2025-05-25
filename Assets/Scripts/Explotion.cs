@@ -1,12 +1,12 @@
 using System;
 using Cinemachine;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Explotion : MonoBehaviour
 {
     #region Properties
     public event Action OnExplosion;
+    [SerializeField] private float _explosionForce = 1000;
     public GameObject Player { get; set; }
     #endregion
 
@@ -40,7 +40,7 @@ public class Explotion : MonoBehaviour
             Player = other.gameObject;
             _explosionPrefab.GetComponent<ParticleSystem>().Play();
         }
-
+        ExplosionForce();
         OnExplosion?.Invoke();
     }
 
@@ -48,6 +48,18 @@ public class Explotion : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, _explosionArea);
+    }
+    private void ExplosionForce()
+    {
+        Collider[] objects = Physics.OverlapSphere(transform.position, _explosionArea);
+        for (int i = 0; i < objects.Length; i++)
+        {
+            Rigidbody objectRB = objects[i].GetComponent<Rigidbody>();
+            if (objectRB != null)
+            {
+                objectRB.AddExplosionForce(_explosionForce, transform.position, _explosionArea);
+            }
+        }
     }
     #endregion
 }
