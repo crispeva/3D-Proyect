@@ -77,8 +77,7 @@ public class GameController : MonoBehaviour
             playeAnim.enabled = false;
         }
             //Desactiva controlador input
-
-        if (_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = false;
+            if (_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = false;
         }
     }
     private void OnCameraFollow()
@@ -112,9 +111,10 @@ public class GameController : MonoBehaviour
         if (playeAnim != null)
         {
             playeAnim.enabled = true;
+            playeAnim.SetTrigger("StandUp");
         }
         //Desactiva controlador input
-        if(_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = true;
+        if (_explosion.Player != null) _explosion.Player.GetComponentInParent<PlayerInput>().enabled = true;
 
         // Reactiva controlador
         Debug.Log("Jugador recuperado");
